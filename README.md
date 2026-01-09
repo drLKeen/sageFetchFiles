@@ -1,5 +1,5 @@
 # sageFetchFiles
-A workflow for automatically downloading data from the SAGE (formerly IRIS) seismic data website via their FDSNWS interface
+A workflow for automatically accessing data from the SAGE (formerly IRIS) seismic data website via their FDSNWS interface
 
 # Dependencies
 To process certain data formats, you'll need to also install their related read/write functions from File Exchange. \
