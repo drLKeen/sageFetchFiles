@@ -1,13 +1,30 @@
 function [S] = sageFetch(request_info)
-% SAGEFETCH - Fetch MiniSEED data from EarthScope dataselect service
+% SAGEFETCH - Fetch data from EarthScope via FDSN services.
+%
 %
 % Input arguments:
-% request_info - struct with fields controlling query and output
+% request_info - struct with fields controlling containing information for
+% building the URL to access data
 %
 % Output arguments:
-% S - parsed waveform structure returned by rdmseed
+% S - parsed waveform structure and associated data and metadata
+%
+% sageFetch waveform retrieval methods:
+%    Table - retrieve waveforms with channel metadata (miniSeed style)
+%    Structure - retrieve waveforms with channel metadata (SAC style)
+%   
+%   Francois Beaucel has created functions for parsing miniSeed and SAC
+%   files. Please download the corresponding functions from his entry on
+%   MATLAB File Exchange or from his GitHub repository.
 % 
-% created by Dr. L. Keen, Jan - 2026; last updated 01/09/2026
+% sageFetch FDSN event webservice: not yet implemented
+% sageFetch miscellaneous: not yet implemented
+% For additional guidance: not yet implemented
+%
+% README and Copyright location: 
+%
+% created by Dr. L. Keen, Jan - 2026; last updated 01/15/2026
+
 %-------------------------------------------------------------------%
 
 % Check whether the matlab.net.http package is available. Info at https://www.mathworks.com/help/matlab/http-interface.html
@@ -28,61 +45,44 @@ function [S] = sageFetch(request_info)
 %end
 
 %-------------------------------------------------------------------%
-% Build the data URL based on inputs
-url_base = 'https://service.earthscope.org/fdsnws/dataselect/1/';
+%-------------------------------------------------------------------%
+% Build the data URL based on inputs and what retreival service you're
+% using
+% Universal inputs:
 if request_info.useAuth == 1
     userAuth = 'auth';
 else
     userAuth = '';
 end
 auth = strcat('query',userAuth,'?');
-%
-if request_info.network ~= ""
-    net = strcat('&net=',request_info.network);
-else
-    net = '';
-end
+
 %
 if request_info.station ~= ""
     sta = strcat('&sta=',request_info.station);
 else
-    sta = '';
+     error('You must provide a station from which to retrieve data.');
+
 end
-%
-if request_info.location ~= ""
-    loc = strcat("&location=",request_info.location);
-else
-    loc = '';
-end
+
 %
 if request_info.channel ~= ""
     cha = strcat('&cha=',request_info.channel);
 else
     cha = '';
+    disp('Retrieving all channels. This may take a while.')
 end
-%
-if request_info.start_time ~= ""
-    startT = strcat('&starttime=',datestr(request_info.start_time,'yyyy-mm-dd'),'T00:00:00');
-else
-    startT = '';
-end
-%
-if request_info.end_time ~= ""
-    endT = strcat('&endtime=',datestr(request_info.end_time,'yyyy-mm-dd'),'T00:00:00');
-else
-    endT = '';
-end
+
 %
 if request_info.quality ~= ""
     quality = strcat('&quality=',request_info.quality);
 else
-    quality = '';
+    quality = 'M';
 end
 %
 if request_info.file_format ~= ""
     format1 = strcat('&format=',request_info.file_format);
 else
-    format1 = '';
+    error('You must provide a file format, either miniSEED if you want a MATLAB table, or sac.zip if you want a MATLAB struct');
 end
 %
 if request_info.longestOnly == 1
@@ -90,24 +90,94 @@ if request_info.longestOnly == 1
 else
     longestO = '';
 end
-% https://service.earthscope.org/fdsnws/dataselect/1/queryauth?net=IU&sta=ANMO&loc=01&cha=BHZ&quality=D&format=miniseed&minimumlength=0.1&longestonly=true&nodata=404
-%minimumlength = strcat('&minimumlength=',request_info.min_length); no
-%longer supported
-nodata = '&nodata=404';
-url = strcat(url_base,auth,net,sta,loc,cha,startT,endT,quality,format1,longestO,nodata);
+
+%-------------------------------------------------------------------%
+% Inputs that change based on the service you're using
+if strcmp(request_info.ws,'fdsnws')
+    if request_info.network ~= ""
+        net = strcat('net=',request_info.network);
+    else
+        error('You must provide a network.');
+    end
+
+    if request_info.location ~= ""
+        loc = strcat("&loc=",request_info.location);
+    else
+        loc = '';
+    end
+    %
+    if request_info.start_time ~= ""
+        startT = strcat('&starttime=',request_info.start_time);
+    else
+        startT = '';
+        disp('Retrieving ALL data from this station. Please be patient.')
+    end
+    %
+    if request_info.end_time ~= ""
+        endT = strcat('&endtime=',request_info.end_time);
+    else
+        endT = strcat('&endtime=',datestr(today,'yyyy-mm-dd'),'T00:00:00');
+        disp('No end time specified. End time set to today.')
+    end
+
+
+    nodata = '&nodata=404';
+    url_base = 'https://service.earthscope.org/fdsnws/dataselect/1/';
+    url = strcat(url_base,auth,net,sta,loc,cha,startT,endT,quality,format1,longestO,nodata)
+
+%-------------------------------------------------------------------%
+
+elseif strcmp(request_info.ws,'timeseries')
+    %
+    if request_info.network ~= ""
+        net = strcat('net=',request_info.network);
+    else
+        net = '';
+    end
+
+    if request_info.location ~= ""
+        loc = strcat("&loc=",request_info.location);
+    else
+        loc = '';
+    end
+    %
+    if request_info.start_time ~= ""
+        startT = strcat('&start=',request_info.start_time);
+    else
+        startT = '';
+        disp('Retrieving ALL data from this station. Please be patient.') 
+    end
+    %
+    if request_info.end_time ~= ""
+        endT = strcat('&end=',request_info.end_time);
+    else
+        endT = strcat('&end=',datestr(today,'yyyy-mm-dd'),'T00:00:00');
+        disp('No end time specified. End time set to today.')
+    end
+
+    url_base = 'https://service.earthscope.org/irisws/timeseries/1/';
+    url = strcat(url_base,auth,net,sta,cha,startT,endT,quality,format1,longestO,loc)
+
+end
+
+%-------------------------------------------------------------------%
 %-------------------------------------------------------------------%
 % Retrieve the data at the specified URL
 uri = URI(url);
 req = RequestMessage;
 resp = req.send(uri);
+
 % Check HTTP status
 if resp.StatusCode ~= 200
     error("HTTP request failed: %d %s", resp.StatusCode, char(resp.StatusCode.ReasonPhrase));
 end
+
 % Get raw bytes (uint8)
 raw = uint8(resp.Body.Data);         % ensure uint8
+
 % Create a single filename (char)
 tmp = char(tempname + ".mseed");     % tempname -> string concat -> char
+
 % Write, checking fopen
 [fid, msg] = fopen(tmp, 'w');
 if fid == -1
@@ -115,19 +185,36 @@ if fid == -1
 end
 count = fwrite(fid, raw, 'uint8');
 fclose(fid);
-%fprintf("Wrote %d bytes to %s\n", count, tmp);
+
 % Verify file exists
 if ~isfile(tmp)
     error("Temporary file not found after write: %s", tmp);
 end
+
+
+if strcmp(request_info.file_format, 'miniseed')
 % Now call the reader (example: rdmseed). Convert to char again if required.
 %try
     S = rdmseed(tmp); % this function is from File Exchange!!
 %catch ME
  %   error('You must download rdmseed from File Exchange: https://www.mathworks.com/matlabcentral/fileexchange/28803-rdmseed-and-mkmseed-read-and-write-miniseed-files. If the function is already downloaded, make sure it is discoverable on your MATLAB path!')
 %end
+
+elseif strcmp(request_info.file_format,'sac.zip')
+    uz = unzip(tmp);
+    [D,T0,S] = rdsac(uz{1});
+    
+    S.D = D;
+    S.T0 = T0;
+
+end
+
+
 % Clean up
+% delete tmp file from my disk
+fclose all; % you have to close the tmp file you've opened or else matlab will not delete it as it's "still in use"
 delete(tmp);
+
 end
 
 %[appendix]{"version":"1.0"}
