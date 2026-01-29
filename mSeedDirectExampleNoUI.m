@@ -4,17 +4,18 @@
 %%
 %[text] ## How to use this notebook
 %[text] ### Data Retrieval- Time Series Data
-%[text] Time series data can be retrieved in the miniSeed format via SAGE's fsdnws service. The function sageFetch.m retrieves the data directly into the MATLAB workspace without downloading the file itself. To build the appropriate URL for fetching data, fill in the fields in the next section. It is okay to leave a field blank. A table called "request\_info" will be assembled with your specified parameters.
+%[text] Time series data can be retrieved in the miniSeed format via SAGE's [iris](https://service.iris.edu/irisws/) and [fdsn](https://service.iris.edu/fdsnws/) web services. The function sageFetch.m retrieves the data directly into the MATLAB workspace without downloading the file itself. To build the appropriate URL for fetching data, fill in the fields in the next section. It is okay to leave a field blank. A table called "request\_info" will be assembled with your specified parameters.
 %[text] SageFetch takes the request\_info table as an input and builds the URL for requesting your desired data. The URL building works in the same way as SAGE's own URL builder, composing a URL string from your input criteria. SageFetch then uses [MATLAB's built-in RESTful web service functions](https://www.mathworks.com/help/matlab/http-interface.html?s_tid=CRUX_lftnav) to bring the requested data directly from the internet into your workspace. However, in order to interpret the trace data, sageFetch calls one of two functions  created by [François Beauducel](https://www.mathworks.com/matlabcentral/profile/authors/1195687): [rdmseed](https://www.mathworks.com/matlabcentral/fileexchange/28803-rdmseed-and-mkmseed-read-and-write-miniseed-files?s_tid=prof_contriblnk) or [rdsac](https://www.mathworks.com/matlabcentral/fileexchange/46356-rdsac-and-mksac-read-and-write-sac-seismic-data-file?s_tid=prof_contriblnk). They are available on the MATLAB File Exchange or GitHub. If you do not have at least one of these functions downloaded and installed on the MATLAB path, sageFetch will not be able to bring in the data. SageFetch will not be bundling the above functions with the rest of its retrieval code, as they belong to François Beauducel, and his repositories should get credit for the function downloads from everyone using them.
 %[text] With the above functions and MATLAB's built-in ability to read and save csv (or other) file formats, your basic data access needs should be met! However, we are working on also incorporating options to use SAGE's other services (such as downloading specific event metadata). If you have a specific workflow you need help with or want incorporated into sageFetch's capabilities, please reach out to the owner of the repository where you found this notebook!
 %%
 %[text] ## Select your data parameters
+%[text] This setup is for using IRISWS (Iris web services) for retrieving data. This allows a few more parameters to be specified than the FSDN web services. The `ws` flag can be changed from `"timeseries"` to `"webservice"` if you wish to use the FDSN method. The format of the start time and end time may also need to be adjusted. Each has a serparate URL building tool on the SAGE site as the syntax is marginally different between the two.
 ws = "timeseries"; % webservice
 network = "UW";
 station = "KDK";
 location = "--";
 channel = "HNZ";
-start_time = "2026-01-02 04:00:00";
+start_time = "2026-01-04T00:00:00";
 % for now, you'll need to specify your own time if you want it down to the minute and second
 % hours - minutes - seconds
 end_time = "2026-01-02 05:00:00"; 
@@ -38,7 +39,7 @@ clear network station location channel start_time end_time quality file_format l
 % https://service.iris.edu/irisws/timeseries/1/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-04T00:00:00&end=2026-01-05T00:00:00&format=sac.zip&loc=--
 %%
 %[text] ## Retrieve your data
-S = sageFetch(request_info);
+S = sageFetch(request_info); %[output:166d07ff] %[output:197a7ec2]
 
 % save your data as a...
     %% mat file
@@ -84,4 +85,10 @@ title(h,'Multiple Plots')
 %---
 %[metadata:view]
 %   data: {"layout":"inline"}
+%---
+%[output:166d07ff]
+%   data: {"dataType":"textualVariable","outputData":{"name":"url","value":"\"https:\/\/service.earthscope.org\/irisws\/timeseries\/1\/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-02 04:00:00&end=2026-01-02 05:00:00M&format=sac.zip&loc=--\""}}
+%---
+%[output:197a7ec2]
+%   data: {"dataType":"error","outputData":{"errorType":"runtime","text":"Invalid URL: 'https:\/\/service.earthscope.org\/irisws\/timeseries\/1\/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-02 04:00:00&end=2026-01-02 05:00:00M&format=sac.zip&loc=--'.\n\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.net.http.internal.HTTPConnector\/set.URI', 'C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m', 618)\" style=\"font-weight:bold\">matlab.net.http.internal.HTTPConnector\/set.URI<\/a> (<a href=\"matlab: opentoline('C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m',618,0)\">line 618<\/a>)\n            obj.Connection.URL = char(uri); % this may throw if uri is bad\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.net.http.internal.HTTPConnector', 'C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m', 169)\" style=\"font-weight:bold\">matlab.net.http.internal.HTTPConnector<\/a> (<a href=\"matlab: opentoline('C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m',169,0)\">line 169<\/a>)\n            obj.URI = uri;\n            ^^^^^^^^^^^^^^\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.net.http.RequestMessage\/send', 'C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\RequestMessage.m', 472)\" style=\"font-weight:bold\">matlab.net.http.RequestMessage\/send<\/a> (<a href=\"matlab: opentoline('C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\RequestMessage.m',472,0)\">line 472<\/a>)\n            connector = HTTPConnector(completedURI, options, [], obj.Header);\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('sageFetch', 'C:\\Users\\MathWorks\\MATLAB Drive\\Repositories\\sageFetchFiles\\sageFetch.m', 168)\" style=\"font-weight:bold\">sageFetch<\/a> (<a href=\"matlab: opentoline('C:\\Users\\MathWorks\\MATLAB Drive\\Repositories\\sageFetchFiles\\sageFetch.m',168,0)\">line 168<\/a>)\nresp = req.send(uri);\n^^^^^^^^^^^^^^^^^^^^^"}}
 %---

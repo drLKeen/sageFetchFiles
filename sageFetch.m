@@ -155,7 +155,7 @@ elseif strcmp(request_info.ws,'timeseries')
         disp('No end time specified. End time set to today.')
     end
 
-    url_base = 'https://service.earthscope.org/irisws/timeseries/1/';
+    url_base = 'https://service.iris.edu/irisws/timeseries/1/';
     url = strcat(url_base,auth,net,sta,cha,startT,endT,quality,format1,longestO,loc)
 
 end
