@@ -8,6 +8,7 @@ This workflow allows you to:
 * Plot the data and optionally save to MAT or SAC.
 
 The code centers around the helper function sageFetch.m, which accepts a request_info table and returns one or more time series records.
+\
 
 # Prerequisites
 * MATLAB (R2019b or newer)
@@ -19,14 +20,13 @@ The code centers around the helper function sageFetch.m, which accepts a request
 * Internet access to SAGE/IRIS web services.
 
 \
-\
 You can obtain the SAC and miniSEED parsers here:
 * rdmseed/mkmseed: https://www.mathworks.com/matlabcentral/fileexchange/28803-rdmseed-and-mkmseed-read-and-write-miniseed-files
 * rdsac/mksac: https://www.mathworks.com/matlabcentral/fileexchange/46356-rdsac-and-mksac-read-and-write-sac-seismic-data-file
 
 Note: These third-party functions are not bundled. Please install them separately to ensure sageFetch can decode the retrieved traces.
 
-
+\
 # General Troubleshooting
 No data returned / 404
 * Verify network, station, channel, and time window.
