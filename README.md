@@ -26,7 +26,7 @@ You can obtain the SAC and miniSEED parsers here:
 
 Note: These third-party functions are not bundled. Please install them separately to ensure sageFetch can decode the retrieved traces.
 
-\
+
 # General Troubleshooting
 No data returned / 404
 * Verify network, station, channel, and time window.
