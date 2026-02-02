@@ -8,7 +8,7 @@ This workflow allows you to:
 * Plot the data and optionally save to MAT or SAC.
 
 The code centers around the helper function sageFetch.m, which accepts a request_info table and returns one or more time series records.
-\
+
 
 # Prerequisites
 * MATLAB (R2019b or newer)
