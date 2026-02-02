@@ -18,7 +18,7 @@ channel = "HNZ";
 start_time = "2026-01-04T00:00:00";
 % for now, you'll need to specify your own time if you want it down to the minute and second
 % hours - minutes - seconds
-end_time = "2026-01-02 05:00:00"; 
+end_time = "2026-01-05T00:00:00"; 
 % for now, you'll need to specify your own time if you want it down to the minute and second
 % hours - minutes - seconds
 
@@ -37,9 +37,10 @@ clear network station location channel start_time end_time quality file_format l
 % working example URLs: 
 % https://service.earthscope.org/fdsnws/dataselect/1/query?net=IU&sta=ANMO&loc=00&cha=BHZ&starttime=2016-01-01T00:00:00&endtime=2016-01-13T00:00:00&quality=M&format=miniseed&nodata=404
 % https://service.iris.edu/irisws/timeseries/1/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-04T00:00:00&end=2026-01-05T00:00:00&format=sac.zip&loc=--
+% https://service.iris.edu/irisws/timeseries/1/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-04T00:00:00&end=2026-01-05T00:00:00M&format=sac.zip&loc=--
 %%
 %[text] ## Retrieve your data
-S = sageFetch(request_info); %[output:166d07ff] %[output:197a7ec2]
+S = sageFetch(request_info); %[output:619ed4ab]
 
 % save your data as a...
     %% mat file
@@ -77,7 +78,6 @@ plot(S(3).d)
 
 title(h,'Multiple Plots')
 
-
 %[appendix]{"version":"1.0"}
 %---
 %[metadata:styles]
@@ -86,9 +86,6 @@ title(h,'Multiple Plots')
 %[metadata:view]
 %   data: {"layout":"inline"}
 %---
-%[output:166d07ff]
-%   data: {"dataType":"textualVariable","outputData":{"name":"url","value":"\"https:\/\/service.earthscope.org\/irisws\/timeseries\/1\/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-02 04:00:00&end=2026-01-02 05:00:00M&format=sac.zip&loc=--\""}}
-%---
-%[output:197a7ec2]
-%   data: {"dataType":"error","outputData":{"errorType":"runtime","text":"Invalid URL: 'https:\/\/service.earthscope.org\/irisws\/timeseries\/1\/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-02 04:00:00&end=2026-01-02 05:00:00M&format=sac.zip&loc=--'.\n\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.net.http.internal.HTTPConnector\/set.URI', 'C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m', 618)\" style=\"font-weight:bold\">matlab.net.http.internal.HTTPConnector\/set.URI<\/a> (<a href=\"matlab: opentoline('C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m',618,0)\">line 618<\/a>)\n            obj.Connection.URL = char(uri); % this may throw if uri is bad\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.net.http.internal.HTTPConnector', 'C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m', 169)\" style=\"font-weight:bold\">matlab.net.http.internal.HTTPConnector<\/a> (<a href=\"matlab: opentoline('C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\+internal\\HTTPConnector.m',169,0)\">line 169<\/a>)\n            obj.URI = uri;\n            ^^^^^^^^^^^^^^\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.net.http.RequestMessage\/send', 'C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\RequestMessage.m', 472)\" style=\"font-weight:bold\">matlab.net.http.RequestMessage\/send<\/a> (<a href=\"matlab: opentoline('C:\\Program Files\\MATLAB\\R2025b\\toolbox\\matlab\\external\\interfaces\\webservices\\http\\+matlab\\+net\\+http\\RequestMessage.m',472,0)\">line 472<\/a>)\n            connector = HTTPConnector(completedURI, options, [], obj.Header);\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nError in <a href=\"matlab:matlab.lang.internal.introspective.errorDocCallback('sageFetch', 'C:\\Users\\MathWorks\\MATLAB Drive\\Repositories\\sageFetchFiles\\sageFetch.m', 168)\" style=\"font-weight:bold\">sageFetch<\/a> (<a href=\"matlab: opentoline('C:\\Users\\MathWorks\\MATLAB Drive\\Repositories\\sageFetchFiles\\sageFetch.m',168,0)\">line 168<\/a>)\nresp = req.send(uri);\n^^^^^^^^^^^^^^^^^^^^^"}}
+%[output:619ed4ab]
+%   data: {"dataType":"textualVariable","outputData":{"name":"url","value":"\"https:\/\/service.iris.edu\/irisws\/timeseries\/1\/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-04T00:00:00&end=2026-01-05T00:00:00&format=sac.zip&loc=--\""}}
 %---

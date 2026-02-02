@@ -1,29 +1,30 @@
 function [S] = sageFetch(request_info)
 % SAGEFETCH - Fetch data from EarthScope via FDSN services.
+% Syntax
+%   S = sageFetch(request_info)
+%   
+%   Input arguments:
+%   request_info - struct with fields controlling containing information for
+%                  building the URL to access data
 %
-%
-% Input arguments:
-% request_info - struct with fields controlling containing information for
-% building the URL to access data
-%
-% Output arguments:
-% S - parsed waveform structure and associated data and metadata
+%   Output arguments:
+%   S - parsed waveform structure and associated data and metadata
 %
 % sageFetch waveform retrieval methods:
-%    Table - retrieve waveforms with channel metadata (miniSeed style)
-%    Structure - retrieve waveforms with channel metadata (SAC style)
+%   Table - retrieve waveforms with channel metadata (miniSeed style)
+%   Structure - retrieve waveforms with channel metadata (SAC style)
 %   
-%   Francois Beaucel has created functions for parsing miniSeed and SAC
-%   files. Please download the corresponding functions from his entry on
-%   MATLAB File Exchange or from his GitHub repository.
+% Francois Beaucel has created functions for parsing miniSeed and SAC
+% files. Please download the corresponding functions from his entry on
+% MATLAB File Exchange or from his GitHub repository.
 % 
 % sageFetch FDSN event webservice: not yet implemented
 % sageFetch miscellaneous: not yet implemented
 % For additional guidance: not yet implemented
 %
-% README and Copyright location: 
+% README and Copyright location: https://github.com/drLKeen/sageFetchFiles/
 %
-% created by Dr. L. Keen, Jan - 2026; last updated 01/15/2026
+% created by Dr. L. Keen, Jan - 2026; last updated 02/02/2026
 
 %-------------------------------------------------------------------%
 
@@ -73,11 +74,11 @@ else
 end
 
 %
-if request_info.quality ~= ""
-    quality = strcat('&quality=',request_info.quality);
-else
-    quality = 'M';
-end
+ if request_info.quality ~= ""
+     quality = strcat('&quality=',request_info.quality);
+ else
+     quality = 'M';
+ end
 %
 if request_info.file_format ~= ""
     format1 = strcat('&format=',request_info.file_format);
@@ -156,7 +157,7 @@ elseif strcmp(request_info.ws,'timeseries')
     end
 
     url_base = 'https://service.iris.edu/irisws/timeseries/1/';
-    url = strcat(url_base,auth,net,sta,cha,startT,endT,quality,format1,longestO,loc)
+    url = strcat(url_base,auth,net,sta,cha,startT,endT,format1,longestO,loc)
 
 end
 
