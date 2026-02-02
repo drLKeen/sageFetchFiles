@@ -18,7 +18,8 @@ The code centers around the helper function sageFetch.m, which accepts a request
 
 * Internet access to SAGE/IRIS web services.
 
-\\
+\
+\
 You can obtain the SAC and miniSEED parsers here:
 * rdmseed/mkmseed: https://www.mathworks.com/matlabcentral/fileexchange/28803-rdmseed-and-mkmseed-read-and-write-miniseed-files
 * rdsac/mksac: https://www.mathworks.com/matlabcentral/fileexchange/46356-rdsac-and-mksac-read-and-write-sac-seismic-data-file
