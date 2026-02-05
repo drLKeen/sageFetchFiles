@@ -37,7 +37,6 @@ clear network station location channel start_time end_time quality file_format l
 % working example URLs: 
 % https://service.earthscope.org/fdsnws/dataselect/1/query?net=IU&sta=ANMO&loc=00&cha=BHZ&starttime=2016-01-01T00:00:00&endtime=2016-01-13T00:00:00&quality=M&format=miniseed&nodata=404
 % https://service.iris.edu/irisws/timeseries/1/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-04T00:00:00&end=2026-01-05T00:00:00&format=sac.zip&loc=--
-% https://service.iris.edu/irisws/timeseries/1/query?net=UW&sta=KDK&cha=HNZ&start=2026-01-04T00:00:00&end=2026-01-05T00:00:00M&format=sac.zip&loc=--
 %%
 %[text] ## Retrieve your data
 S = sageFetch(request_info); %[output:619ed4ab]
