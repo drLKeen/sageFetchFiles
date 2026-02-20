@@ -24,16 +24,16 @@ classdef sageFetchObj
      DATE_FORMATTER    = 'yyyy-mm-dd HH:MM:SS.FFF'; %default data format, in ms NEED TO ADD A "T"
 
      VALID_QUALITIES   = {'D','R','Q','M','B'}; % list of Qualities accepted by Traces
-     DEFAULT_QUALITY   = 'M'; % default Quality for Traces
+     DEFAULT_QUALITY   = 'M'; % default Quality for Timeseries
      FETCHER_LIST      = {'Timeseries','Catalog','Resp'}; % list of functions that fetch
      URL_BASE          = {'https://service.iris.edu/irisws/'};
    end %constant properties
+%% Methods
+methods(Static)
 
-
-   methods(Static)
-%
+%% Timeseries
 function S = Timeseries(network, station, location, channel, startDate, endDate, varargin)
-% Timeseries  Retrieve SAC-equivalent waveform(s) with optional behaviours.
+% Timeseries  Retrieve sac-equivalent waveform(s) with optional behaviours.
 % Required inputs:
 %   network, station, location, channel - char/string (can use wildcards/comma lists)
 %   startDate, endDate                 - 'YYYY-MM-DD hh:mm:ss' or with .sss
@@ -45,7 +45,6 @@ function S = Timeseries(network, station, location, channel, startDate, endDate,
     import matlab.net.http.*
 
     str2webdate = @(x) strrep(x,' ', 'T'); % 'YYYY-MM-DD hh:mm:ss' -> 'YYYY-MM-DDThh:mm:ss'
-    web2strdate = @(x) strrep(x,'T',' ');
 
     % basic validation for required args (expand as needed)
     validateattributes(network, {'char','string'}, {'nonempty'});
@@ -89,7 +88,6 @@ function S = Timeseries(network, station, location, channel, startDate, endDate,
     provided = setdiff(allOptNames, p.UsingDefaults);
 
     % Example conditional behaviors based on explicit specification:
-    % (Replace these placeholders with real operations.)
     if ismember('correction', provided)
         corr = lower(char(opts.correction));
         switch corr
@@ -120,8 +118,8 @@ function S = Timeseries(network, station, location, channel, startDate, endDate,
         fmt = lower(char(opts.fileFormat));
         switch fmt
             case 'sac'
-                % user explicitly requested SAC format
-                opts.fileFormat = 'SAC.zip';
+                % user explicitly requested sac format
+                opts.fileFormat = 'sac.zip';
             case 'miniseed'
                 % user explicitly requested MiniSEED
                 opts.fileFormat = 'miniseed';
@@ -141,7 +139,8 @@ function S = Timeseries(network, station, location, channel, startDate, endDate,
         opts.Auth = '';
     end
 
-    % ---- Core retrieval logic (placeholder) ----
+
+    % ---- Core retrieval logic ----
     % Use network/station/location/channel and startDate/endDate to fetch data.
     % Convert dates for web APIs: startWeb = str2webdate(startDate);
     % Respect opts.correction, opts.fileFormat, opts.useAuth and whether they were provided.
@@ -177,61 +176,89 @@ function S = Timeseries(network, station, location, channel, startDate, endDate,
 
     
     baseURL = 'https://service.iris.edu/irisws/';
-    url = strcat(baseURL,'timeseries/1/',auth,net,sta,cha,startT,endT,scale,format1,loc,correct)
+    url = strcat(baseURL,'timeseries/1/',auth,net,sta,cha,startT,endT,scale,format1,loc,correct);
+    disp(url)
 
     % Retrieve the data at the specified URL
-    uri = URI(url);
-    req = RequestMessage;
-    resp = req.send(uri);
-    
-    % Check HTTP status
-    if resp.StatusCode ~= 200
-        error("HTTP request failed: %d %s", resp.StatusCode, char(resp.StatusCode.ReasonPhrase));
-    end
-    
-    % Get raw bytes (uint8)
-    raw = uint8(resp.Body.Data);         % ensure uint8
-    
-    % Create a single filename (char)
-    tmp = char(tempname + ".mseed");     % tempname -> string concat -> char
-    
-    % Write, checking fopen
-    [fid, msg] = fopen(tmp, 'w');
-    if fid == -1
-        error("Failed to open temp file for writing: %s", msg);
-    end
-    count = fwrite(fid, raw, 'uint8');
-    fclose(fid);
-    
-    % Verify file exists
-    if ~isfile(tmp)
-        error("Temporary file not found after write: %s", tmp);
-    end
+    % You can use 'weboptions' to specify a file reader for webread,
+    % thereby enabling the use of the webread function for custom file
+    % formats like sac and miniSEED.
 
     if strcmp(ts.options.fileFormat, 'miniseed')
-    % Now call the reader (example: rdmseed). Convert to char again if required.
-    %try
-        S = rdmseed(tmp); % this function is from File Exchange!!
-    %catch ME
-     %   error('You must download rdmseed from File Exchange: https://www.mathworks.com/matlabcentral/fileexchange/28803-rdmseed-and-mkmseed-read-and-write-miniseed-files. If the function is already downloaded, make sure it is discoverable on your MATLAB path!')
-    %end
+       % Setting the file reader based on chosen file typ and 
+       % increasing the amount of time allowed before timeout because
+       % sometimes it can be slow to contact the SAGE server
+       opts = weboptions('ContentReader',@rdmseed,'Timeout',10);
+
+       try
+        S = webread(url,opts);% rdmseed function is from File Exchange!!
+       catch ME
+           if strcmp(ME.identifier,'MATLAB:webservices:HTTP400StatusCodeError')
+               % custom error explaination
+               msg = 'There are no files available that fit your selected parameters. Try using the sac.zip file format or changing the date range.';
+               newME = MException('MATLAB:webservices:HTTP400StatusCodeError',msg);
+               ME = addCause(ME, newME);
+               rethrow(ME)
+           else
+               rethrow(ME)
+           end
+       
+       end
     
     elseif strcmp(ts.options.fileFormat,'sac.zip')
-        uz = unzip(tmp);
-        [D,T0,S] = rdsac(uz{1});
-        
+       % Setting the file reader based on chosen file typ and 
+       % increasing the amount of time allowed before timeout because
+       % sometimes it can be slow to contact the SAGE server
+       opts = weboptions('ContentReader',@rdsaczip,'Timeout',10);
+       try
+        [D,T0,S] = webread(url,opts);
         S.D = D;
         S.T0 = T0;
-    
+       catch ME
+          if strcmp(ME.identifier,'MATLAB:webservices:HTTP400StatusCodeError')%| strcmp(ME.identifier,'MATLAB:nargoutchk:tooManyOutputs')% |trcmp(ME.identifier,'MATLAB:noSuchMethodOrField')
+               % custom error explaination
+               msg = 'There are no files available that fit your selected parameters. Try using the sac.zip file format or changing the date range.';
+               newME = MException('MATLAB:webservices:HTTP400StatusCodeError',msg);
+               ME = addCause(ME, newME);
+               rethrow(ME)
+          else
+               rethrow(ME)
+       
+          end
+       end
     end
-    
-    
-    % Clean up
-    % delete tmp file from my disk
-    fclose all; % you have to close the tmp file you've opened or else matlab will not delete it as it's "still in use"
-    delete(tmp);
+end
+%% Catalog
+% function C = Catalog(network, station, location, channel, startDate, endDate, varargin)
+% end
+% 
+% %% Resp
+% function R = Resp(network, station, location, channel, startDate, endDate, varargin)
+% end
+% 
+% %% sacpz
+% function S = sacpz(network, station, location, channel, startDate, endDate, varargin)
+% end
 
+%% VirtualNetwork
+% function V = VirtualNetwork(code, starttime, endtime, format, definition)
+%     base_url = 'https://service.iris.edu/irisws/virtualnetwork/1/query?';
+%     codeName = strcat('code=',code);
+% 
+%     if definition == 1
+%         def = strcat('&definition=true');
+%     else 
+%         def = '';
+%     end
+%     format1 = 
+%     startDate = strcat('&starttime=',starttime);
+%     endDate = strcat('&endtime=',endtime);
+% 
+%     url = strcat(baseurl, codeName, def, format1, startDate, endDate)
+% 
+% 
+% end
 end
 end
       
-end
+
