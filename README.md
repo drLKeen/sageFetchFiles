@@ -1,13 +1,14 @@
 # sageFetchFiles
-A workflow for automatically accessing data from the SAGE (formerly IRIS) seismic data website via their IRISWS or FDSNWS interfaces.
+A workflow for automatically accessing data from the SAGE (formerly IRIS) seismic data website via their IRISWS interface. The FDSNWS interface provided by SAGE no longer offers a variety of file types and seems to be updated less often. All files available through FDSNWS are also available through IRISWS.
 
 This workflow allows you to:
-* Specify IRISWS (timeseries) or FDSN dataselect parameters in a single table.
+* Specify IRISWS (timeseries) dataselect parameters in a single table.
 * Programmatically build a standards-compliant URL.
-* Retrieve and parse seismic traces (MiniSEED or SAC) straight into MATLAB structs.
-* Plot the data and optionally save to MAT or SAC.
+* Retrieve and parse seismic traces (MiniSEED or SAC) directly into MATLAB.
+  
+Examples on how to plot and process the data provided.
 
-The code centers around the helper function sageFetch.m, which accepts a request_info table and returns one or more time series records.
+The code centers around the sageFetchObj.m object, which contains functions to call for retrieving data based on variable inputs.
 
 
 # Prerequisites
