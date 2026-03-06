@@ -1,4 +1,4 @@
-# sageFetchFiles
+# sageFetchFiles [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=drLKeen/sageFetchFiles&file=https://github.com/drLKeen/sageFetchFiles/blob/main/README.md)
 A workflow for automatically accessing data from the SAGE (formerly IRIS) seismic data website via their IRISWS interface. The FDSNWS interface provided by SAGE no longer offers a variety of file types and seems to be updated less often. All files available through FDSNWS are also available through IRISWS.
 
 This workflow allows you to:
